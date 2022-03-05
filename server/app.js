@@ -8,8 +8,8 @@ var fs = require('fs');
 var http = require('http');
 var https = require('https');
 //var privateKey  = fs.readFileSync(path.resolve('server/key.pem', 'utf8'));
-var privateKey  = fs.readFileSync('server/key.pem', 'utf8');
-var certificate = fs.readFileSync('server/cert.pem', 'utf8');
+var privateKey  = fs.readFileSync(__dirname + '/key.pem', 'utf8');
+var certificate = fs.readFileSync(__dirname + '/cert.pem','utf8');
 var credentials = {key: privateKey, cert: certificate};
 const app = express();
 
@@ -19,15 +19,15 @@ app.use(body());
 app.use(express.static(path.resolve(__dirname, '..', 'build')));
 
 const db = mysql.createConnection({
-    host: '172.24.32.1',
-    user: 'bonn',
-    password: '1234',
-    database: 'testing'
+    host: '172.17.224.1',
+    user: 'Rattapong',
+    password: '123456',
+    database: 'test'
 });
 // show data
 app.get('/data', function(req,res){
     console.log("Hello in /data ");
-    let sql = 'SELECT * FROM users;';
+    let sql = 'SELECT * FROM user;';
     db.query(sql, (err, result)=>{
         if(err) throw err;
         console.log(result);
@@ -38,7 +38,7 @@ app.get('/data', function(req,res){
 
 //delete
 app.put('/delete', function(req, res) {
-    var sql = 'DELETE FROM users WHERE id = ?';
+    var sql = 'DELETE FROM user WHERE id = ?';
     db.query(sql,[req.body.idkey],function (error, results) {
         if(error) throw error;
         res.send(JSON.stringify(results));
@@ -47,7 +47,7 @@ app.put('/delete', function(req, res) {
 
 //edit
 app.put('/data', function(req, res) {
-    var sql = 'UPDATE users SET firstname= ? , lastname = ? WHERE id = ?';
+    var sql = 'UPDATE user SET firstname= ? , lastname = ? WHERE id = ?';
     db.query(sql,[req.body.firstname,req.body.lastname,req.body.idkey],function (error, results) {
         if(error) throw error;
         res.send(JSON.stringify(results));
@@ -60,9 +60,10 @@ app.post('/data', function(req, res){
     let data = {
         id:req.body.idkey,
         firstname:req.body.firstname,
-        lastname:req.body.lastname
+        lastname:req.body.lastname,
+        email1:req.body.email1
     };
-    let sql = 'INSERT INTO users SET ?';
+    let sql = 'INSERT INTO user SET ?';
     db.query(sql, data, (err, result)=>{
         if(err){
             console.log(err);
